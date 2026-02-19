@@ -55,6 +55,8 @@ spec:
             value: {{ .Values.agent.jenkinsUrl }}
           - name: JENKINS_AGENT_NAME
             value: {{ .Values.agent.name }}
+          - name: JENKINS_AGENT_WORKDIR
+            value: {{ .Values.agent.workDir }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:

@@ -124,6 +124,7 @@ affinity: {}
 
 agent:
   name: "my-agent"
+  workDir: "/home/ubuntu/jenkins"
   jenkinsUrl: "http://jenkins-server:50000"
   jenkinsSecret: "supersecretvalue123@"
   # Secret name for Jenkins Agent to join master, must have a key named "JENKINS_SECRET"
