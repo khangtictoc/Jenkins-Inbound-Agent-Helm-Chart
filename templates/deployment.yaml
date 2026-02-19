@@ -53,6 +53,8 @@ spec:
           {{ end }}
           - name: JENKINS_URL
             value: {{ .Values.agent.jenkinsUrl }}
+          - name: JENKINS_AGENT_NAME
+            value: {{ .Values.agent.name }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
