@@ -1,26 +1,40 @@
 # .github/workflows/release.yaml
-name: Release Charts
+name: Release Helm Chart
+
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   release:
+    runs-on: ubuntu-latest
     permissions:
       contents: write
-    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-
-      - uses: helm/chart-releaser-action@v1.6.0
-        env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Install Helm
+        uses: azure/setup-helm@v4
         with:
-          charts_dir: .
+          version: v3.14.0
+
+      - name: Package Helm Chart
+        run: |
+          helm package . --destination ./dist        # ← package from root directly
+
+      - name: Generate index.yaml
+        run: |
+          helm repo index ./dist \
+            --url https://khangtictoc.github.io/jenkins-inbound-agent-helm-chart
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist # push dist/ contents to gh-pages
+          keep_files: true
