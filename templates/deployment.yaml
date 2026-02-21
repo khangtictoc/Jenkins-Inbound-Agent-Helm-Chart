@@ -73,17 +73,34 @@ spec:
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-      {{ if .Values.agent.kaniko.enabled }}
+        {{ if .Values.agent.kaniko.enabled }}
         - name: kaniko
           image: gcr.io/kaniko-project/executor:debug
           command:
             - /busybox/sleep
             - infinity
-      {{- end }}
-      {{- with .Values.volumes }}
+          volumeMounts:
+          - name: workspace
+            mountPath: /workspace
+          - name: dockerhub-secret
+            mountPath: /kaniko/.docker
+            readOnly: true
+        {{- end }}
+      
       volumes:
+        {{ if .Values.agent.kaniko.enabled }}
+        - name: workspace
+          emptyDir: {}
+        - name: dockerhub-secret
+          secret:
+            secretName: {{ .Values.agent.kaniko.dockerSecretName }}
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+        {{- end }}
+        {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

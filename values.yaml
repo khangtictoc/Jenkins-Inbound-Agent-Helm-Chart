@@ -132,3 +132,4 @@ agent:
   # Enable Kaniko for building container images
   kaniko:
     enabled: false
+    dockerSecretName: ""
