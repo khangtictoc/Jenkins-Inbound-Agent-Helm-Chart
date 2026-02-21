@@ -77,7 +77,8 @@ spec:
         - name: kaniko
           image: gcr.io/kaniko-project/executor:debug
           command:
-            - /busybox/cat
+            - /busybox/sleep
+            - infinity
       {{- end }}
       {{- with .Values.volumes }}
       volumes:
