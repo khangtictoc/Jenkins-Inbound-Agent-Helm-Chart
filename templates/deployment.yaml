@@ -70,7 +70,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- /* combine user-provided mounts and sharedVolumes */}}
-          {{- if or .Values.volumeMounts .Values.sharedVolumes }}
+          {{- if or .Values.volumeMounts .Values.agent.kaniko.sharedVolumes }}
           volumeMounts:
             {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
