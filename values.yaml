@@ -133,3 +133,7 @@ agent:
   kaniko:
     enabled: false
     dockerSecretName: ""
+    # (Optional) Shared volume for Kaniko workspace. Most cases will use if Kaniko is enabled
+    sharedVolumes:
+      - name: ""
+        mountPath: ""

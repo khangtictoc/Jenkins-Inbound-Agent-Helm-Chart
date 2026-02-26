@@ -69,9 +69,18 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
+          {{- /* combine user-provided mounts and sharedVolumes */}}
+          {{- if or .Values.volumeMounts .Values.sharedVolumes }}
           volumeMounts:
+            {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}
+            {{- end }}
+            {{- with .Values.agent.kaniko.sharedVolumes }}
+            {{- range . }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+            {{- end }}
+            {{- end }}
           {{- end }}
         {{ if .Values.agent.kaniko.enabled }}
         - name: kaniko
@@ -80,23 +89,31 @@ spec:
             - /busybox/sleep
             - infinity
           volumeMounts:
-          - name: workspace
-            mountPath: /workspace
           - name: dockerhub-secret
             mountPath: /kaniko/.docker
             readOnly: true
+          {{- with .Values.agent.kaniko.sharedVolumes }}
+          {{- range . }}
+          - name: {{ .name }}
+            mountPath: {{ .mountPath }}
+          {{- end }}
+          {{- end }}
         {{- end }}
       
       volumes:
         {{ if .Values.agent.kaniko.enabled }}
-        - name: workspace
-          emptyDir: {}
         - name: dockerhub-secret
           secret:
             secretName: {{ .Values.agent.kaniko.dockerSecretName }}
             items:
               - key: .dockerconfigjson
                 path: config.json
+        {{- end }}
+        {{- with .Values.agent.kaniko.sharedVolumes }}
+        {{- range . }}
+        - name: {{ .name }}
+          emptyDir: {}
+        {{- end }}
         {{- end }}
         {{- with .Values.volumes }}
         {{- toYaml . | nindent 8 }}
